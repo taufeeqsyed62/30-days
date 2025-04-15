@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days Challenge</title>
+    <style>
+        :root {
+            --primary-color: #4e54c8;
+            --primary-light: #8f94fb;
+            --secondary-color: #6c63ff;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --grey-color: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, var(--primary-light), var(--primary-color));
+            color: var(--dark-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .challenge-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .progress-container {
+            background-color: var(--grey-color);
+            border-radius: 20px;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(to right, var(--primary-light), var(--primary-color));
+            transition: width 0.5s ease;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--light-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .day-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .day-status {
+            font-size: 0.8rem;
+            color: var(--grey-color);
+        }
+
+        .day.completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .day.completed .day-status {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .home-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .home-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .home-subtitle {
+            color: var(--dark-color);
+            opacity: 0.7;
+        }
+
+        .overall-progress {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .overall-progress h2 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .circle-progress {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary-color) 0%, var(--primary-light) 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .circle-progress::before {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        .percentage {
+            position: relative;
+            z-index: 1;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .tab-container {
+                flex-direction: column;
+            }
+            
+            .calendar {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>30 Days Challenge</h1>
+        </header>
+
+        <div class="tab-container">
+            <button class="tab active" data-tab="home">Home</button>
+            <button class="tab" data-tab="sugar">Sugar Challenge</button>
+            <button class="tab" data-tab="gym">Gym Challenge</button>
+            <button class="tab" data-tab="development">Development Study</button>
+            <button class="tab" data-tab="dsa">DSA</button>
+            <button class="tab" data-tab="english">English Language</button>
+            <button class="tab" data-tab="psychology">Psychology</button>
+            <button class="tab" data-tab="selfcare">Self Care</button>
+        </div>
+
+        <div id="home" class="tab-content active">
+            <div class="home-header">
+                <h2 class="home-title">Welcome to Your 30 Days Challenge</h2>
+                <p class="home-subtitle">Track your progress across all challenges</p>
+            </div>
+            
+            <div class="overall-progress">
+                <h2>Overall Progress</h2>
+                <div class="progress-container">
+                    <div class="progress-bar" id="overall-progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="circle-progress">
+                    <span class="percentage">0%</span>
+                </div>
+            </div>
+
+            <div class="summary-grid" id="summary-grid">
+                <!-- Challenge summaries will be added here dynamically -->
+            </div>
+        </div>
+
+        <div id="sugar" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Sugar Challenge</h2>
+                <span class="days-completed" id="sugar-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="sugar-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="sugar-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="sugar">Reset Progress</button>
+        </div>
+
+        <div id="gym" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Gym Challenge</h2>
+                <span class="days-completed" id="gym-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="gym-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="gym-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="gym">Reset Progress</button>
+        </div>
+
+        <div id="development" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Development Study</h2>
+                <span class="days-completed" id="development-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="development-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="development-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="development">Reset Progress</button>
+        </div>
+
+        <div id="dsa" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">DSA Challenge</h2>
+                <span class="days-completed" id="dsa-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="dsa-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="dsa-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="dsa">Reset Progress</button>
+        </div>
+
+        <div id="english" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">English Language</h2>
+                <span class="days-completed" id="english-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="english-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="english-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="english">Reset Progress</button>
+        </div>
+
+        <div id="psychology" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Psychology</h2>
+                <span class="days-completed" id="psychology-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="psychology-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="psychology-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="psychology">Reset Progress</button>
+        </div>
+
+        <div id="selfcare" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Self Care</h2>
+                <span class="days-completed" id="selfcare-days-completed">0/30 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="selfcare-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="selfcare-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="selfcare">Reset Progress</button>
+        </div>
+    </div>
+
+    <script>
+        // Define all challenges
+        const challenges = [
+            'sugar', 
+            'gym', 
+            'development', 
+            'dsa', 
+            'english', 
+            'psychology', 
+            'selfcare'
+        ];
+
+        // Initialize the app
+        function initApp() {
+            // Create calendars for each challenge
+            challenges.forEach(challenge => {
+                createCalendar(challenge);
+                updateProgress(challenge);
+            });
+
+            // Create summary cards for the home page
+            updateSummaryGrid();
+            updateOverallProgress();
+
+            // Set up tab navigation
+            setupTabs();
+
+            // Add event listeners to reset buttons
+            document.querySelectorAll('.reset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const challenge = this.dataset.challenge;
+                    resetProgress(challenge);
+                });
+            });
+        }
+
+        // Create calendar for a challenge
+        function createCalendar(challenge) {
+            const calendar = document.getElementById(`${challenge}-calendar`);
+            calendar.innerHTML = '';
+            
+            // Get saved progress for this challenge
+            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+            
+            // Create 30 days
+            for (let i = 1; i <= 30; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                
+                if (savedProgress[i]) {
+                    dayElement.classList.add('completed');
+                }
+                
+                dayElement.innerHTML = `
+                    <span class="day-number">${i}</span>
+                    <span class="day-status">${savedProgress[i] ? 'Done' : 'Not Done'}</span>
+                `;
+                
+                dayElement.addEventListener('click', () => toggleDayStatus(challenge, i));
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Toggle the status of a day
+        function toggleDayStatus(challenge, day) {
+            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+            savedProgress[day] = !savedProgress[day];
+            
+            localStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
+            
+            createCalendar(challenge);
+            updateProgress(challenge);
+            updateSummaryGrid();
+            updateOverallProgress();
+        }
+
+        // Update progress for a challenge
+        function updateProgress(challenge) {
+            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+            const completedDays = Object.values(savedProgress).filter(value => value).length;
+            const progressPercentage = (completedDays / 30) * 100;
+            
+            document.getElementById(`${challenge}-progress`).style.width = `${progressPercentage}%`;
+            document.getElementById(`${challenge}-days-completed`).textContent = `${completedDays}/30 days completed`;
+        }
+
+        // Reset progress for a challenge
+        function resetProgress(challenge) {
+            if (confirm(`Are you sure you want to reset your progress for the ${challenge.charAt(0).toUpperCase() + challenge.slice(1)} Challenge?`)) {
+                localStorage.removeItem(`${challenge}-progress`);
+                createCalendar(challenge);
+                updateProgress(challenge);
+                updateSummaryGrid();
+                updateOverallProgress();
+            }
+        }
+
+        // Update the summary grid on the home page
+        function updateSummaryGrid() {
+            const summaryGrid = document.getElementById('summary-grid');
+            summaryGrid.innerHTML = '';
+            
+            challenges.forEach(challenge => {
+                const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+                const completedDays = Object.values(savedProgress).filter(value => value).length;
+                const progressPercentage = (completedDays / 30) * 100;
+                
+                const summaryCard = document.createElement('div');
+                summaryCard.classList.add('summary-card');
+                
+                // Capitalize challenge name
+                const challengeName = challenge.charAt(0).toUpperCase() + challenge.slice(1);
+                
+                summaryCard.innerHTML = `
+                    <h3>${challengeName} Challenge</h3>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progressPercentage}%"></div>
+                    </div>
+                    <p>${completedDays}/30 days completed (${Math.round(progressPercentage)}%)</p>
+                `;
+                
+                summaryGrid.appendChild(summaryCard);
+            });
+        }
+
+        // Update overall progress on the home page
+        function updateOverallProgress() {
+            let totalDays = challenges.length * 30;
+            let totalCompletedDays = 0;
+            
+            challenges.forEach(challenge => {
+                const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+                const completedDays = Object.values(savedProgress).filter(value => value).length;
+                totalCompletedDays += completedDays;
+            });
+            
+            const overallPercentage = (totalCompletedDays / totalDays) * 100;
+            
+            document.getElementById('overall-progress-bar').style.width = `${overallPercentage}%`;
+            document.querySelector('.percentage').textContent = `${Math.round(overallPercentage)}%`;
+            document.querySelector('.circle-progress').style.background = 
+                `conic-gradient(var(--primary-color) ${overallPercentage}%, var(--grey-color) 0)`;
+        }
+
+        // Set up tab navigation
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and tab contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to the clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabId = tab.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
