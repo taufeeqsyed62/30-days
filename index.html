@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30 Days Challenge</title>
+    <title>21 Days Challenge</title>
     <style>
         :root {
             --primary-color: #4e54c8;
@@ -134,6 +134,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .day:hover {
@@ -149,7 +150,39 @@
 
         .day-status {
             font-size: 0.8rem;
-            color: var(--grey-color);
+            color: var(--dark-color);
+            opacity: 0.7;
+        }
+
+        .day-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            overflow: hidden;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .day-action {
+            flex: 1;
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .day-action.done {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .day-action.not-done {
+            background-color: var(--danger-color);
+            color: white;
         }
 
         .day.completed {
@@ -157,7 +190,12 @@
             color: white;
         }
 
-        .day.completed .day-status {
+        .day.not-completed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .day.completed .day-status, .day.not-completed .day-status {
             color: rgba(255, 255, 255, 0.7);
         }
 
@@ -274,7 +312,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>30 Days Challenge</h1>
+            <h1>21 Days Challenge</h1>
         </header>
 
         <div class="tab-container">
@@ -286,11 +324,12 @@
             <button class="tab" data-tab="english">English Language</button>
             <button class="tab" data-tab="psychology">Psychology</button>
             <button class="tab" data-tab="selfcare">Self Care</button>
+            <button class="tab" data-tab="powerup">Power Up</button>
         </div>
 
         <div id="home" class="tab-content active">
             <div class="home-header">
-                <h2 class="home-title">Welcome to Your 30 Days Challenge</h2>
+                <h2 class="home-title">Welcome to Your 21 Days Challenge</h2>
                 <p class="home-subtitle">Track your progress across all challenges</p>
             </div>
             
@@ -312,7 +351,7 @@
         <div id="sugar" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">Sugar Challenge</h2>
-                <span class="days-completed" id="sugar-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="sugar-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="sugar-progress" style="width: 0%"></div>
@@ -326,7 +365,7 @@
         <div id="gym" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">Gym Challenge</h2>
-                <span class="days-completed" id="gym-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="gym-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="gym-progress" style="width: 0%"></div>
@@ -340,7 +379,7 @@
         <div id="development" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">Development Study</h2>
-                <span class="days-completed" id="development-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="development-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="development-progress" style="width: 0%"></div>
@@ -354,7 +393,7 @@
         <div id="dsa" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">DSA Challenge</h2>
-                <span class="days-completed" id="dsa-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="dsa-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="dsa-progress" style="width: 0%"></div>
@@ -368,7 +407,7 @@
         <div id="english" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">English Language</h2>
-                <span class="days-completed" id="english-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="english-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="english-progress" style="width: 0%"></div>
@@ -382,7 +421,7 @@
         <div id="psychology" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">Psychology</h2>
-                <span class="days-completed" id="psychology-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="psychology-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="psychology-progress" style="width: 0%"></div>
@@ -396,7 +435,7 @@
         <div id="selfcare" class="tab-content">
             <div class="challenge-header">
                 <h2 class="challenge-title">Self Care</h2>
-                <span class="days-completed" id="selfcare-days-completed">0/30 days completed</span>
+                <span class="days-completed" id="selfcare-days-completed">0/21 days completed</span>
             </div>
             <div class="progress-container">
                 <div class="progress-bar" id="selfcare-progress" style="width: 0%"></div>
@@ -405,6 +444,20 @@
                 <!-- Calendar days will be added here dynamically -->
             </div>
             <button class="reset-btn" data-challenge="selfcare">Reset Progress</button>
+        </div>
+
+        <div id="powerup" class="tab-content">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Power Up</h2>
+                <span class="days-completed" id="powerup-days-completed">0/21 days completed</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="powerup-progress" style="width: 0%"></div>
+            </div>
+            <div class="calendar" id="powerup-calendar">
+                <!-- Calendar days will be added here dynamically -->
+            </div>
+            <button class="reset-btn" data-challenge="powerup">Reset Progress</button>
         </div>
     </div>
 
@@ -417,8 +470,26 @@
             'dsa', 
             'english', 
             'psychology', 
-            'selfcare'
+            'selfcare',
+            'powerup'
         ];
+
+        // Total days for challenges
+        const totalDays = 21;
+
+        // In-memory storage to replace localStorage
+        const memoryStorage = {
+            data: {},
+            getItem: function(key) {
+                return this.data[key] ? this.data[key] : null;
+            },
+            setItem: function(key, value) {
+                this.data[key] = value;
+            },
+            removeItem: function(key) {
+                delete this.data[key];
+            }
+        };
 
         // Initialize the app
         function initApp() {
@@ -450,34 +521,56 @@
             calendar.innerHTML = '';
             
             // Get saved progress for this challenge
-            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
+            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
             
-            // Create 30 days
-            for (let i = 1; i <= 30; i++) {
+            // Create 21 days
+            for (let i = 1; i <= totalDays; i++) {
                 const dayElement = document.createElement('div');
                 dayElement.classList.add('day');
                 
-                if (savedProgress[i]) {
+                if (savedProgress[i] === 'done') {
                     dayElement.classList.add('completed');
+                } else if (savedProgress[i] === 'not-done') {
+                    dayElement.classList.add('not-completed');
                 }
+                
+                const statusText = savedProgress[i] === 'done' ? 'Done' : 
+                                  (savedProgress[i] === 'not-done' ? 'Not Done' : 'Choose Status');
                 
                 dayElement.innerHTML = `
                     <span class="day-number">${i}</span>
-                    <span class="day-status">${savedProgress[i] ? 'Done' : 'Not Done'}</span>
+                    <span class="day-status">${statusText}</span>
+                    <div class="day-actions">
+                        <div class="day-action done" data-status="done">Done</div>
+                        <div class="day-action not-done" data-status="not-done">Not Done</div>
+                    </div>
                 `;
                 
-                dayElement.addEventListener('click', () => toggleDayStatus(challenge, i));
+                const actionButtons = dayElement.querySelectorAll('.day-action');
+                actionButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const status = btn.dataset.status;
+                        setDayStatus(challenge, i, status);
+                    });
+                });
                 
                 calendar.appendChild(dayElement);
             }
         }
 
-        // Toggle the status of a day
-        function toggleDayStatus(challenge, day) {
-            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
-            savedProgress[day] = !savedProgress[day];
+        // Set the status of a day
+        function setDayStatus(challenge, day, status) {
+            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
             
-            localStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
+            // Toggle status if already set to this status
+            if (savedProgress[day] === status) {
+                delete savedProgress[day];
+            } else {
+                savedProgress[day] = status;
+            }
+            
+            memoryStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
             
             createCalendar(challenge);
             updateProgress(challenge);
@@ -487,18 +580,18 @@
 
         // Update progress for a challenge
         function updateProgress(challenge) {
-            const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
-            const completedDays = Object.values(savedProgress).filter(value => value).length;
-            const progressPercentage = (completedDays / 30) * 100;
+            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+            const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
+            const progressPercentage = (completedDays / totalDays) * 100;
             
             document.getElementById(`${challenge}-progress`).style.width = `${progressPercentage}%`;
-            document.getElementById(`${challenge}-days-completed`).textContent = `${completedDays}/30 days completed`;
+            document.getElementById(`${challenge}-days-completed`).textContent = `${completedDays}/${totalDays} days completed`;
         }
 
         // Reset progress for a challenge
         function resetProgress(challenge) {
             if (confirm(`Are you sure you want to reset your progress for the ${challenge.charAt(0).toUpperCase() + challenge.slice(1)} Challenge?`)) {
-                localStorage.removeItem(`${challenge}-progress`);
+                memoryStorage.removeItem(`${challenge}-progress`);
                 createCalendar(challenge);
                 updateProgress(challenge);
                 updateSummaryGrid();
@@ -512,9 +605,9 @@
             summaryGrid.innerHTML = '';
             
             challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
-                const completedDays = Object.values(savedProgress).filter(value => value).length;
-                const progressPercentage = (completedDays / 30) * 100;
+                const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+                const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
+                const progressPercentage = (completedDays / totalDays) * 100;
                 
                 const summaryCard = document.createElement('div');
                 summaryCard.classList.add('summary-card');
@@ -527,7 +620,7 @@
                     <div class="progress-container">
                         <div class="progress-bar" style="width: ${progressPercentage}%"></div>
                     </div>
-                    <p>${completedDays}/30 days completed (${Math.round(progressPercentage)}%)</p>
+                    <p>${completedDays}/${totalDays} days completed (${Math.round(progressPercentage)}%)</p>
                 `;
                 
                 summaryGrid.appendChild(summaryCard);
@@ -536,16 +629,16 @@
 
         // Update overall progress on the home page
         function updateOverallProgress() {
-            let totalDays = challenges.length * 30;
+            let totalDaysAll = challenges.length * totalDays;
             let totalCompletedDays = 0;
             
             challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`)) || {};
-                const completedDays = Object.values(savedProgress).filter(value => value).length;
+                const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+                const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
                 totalCompletedDays += completedDays;
             });
             
-            const overallPercentage = (totalCompletedDays / totalDays) * 100;
+            const overallPercentage = (totalCompletedDays / totalDaysAll) * 100;
             
             document.getElementById('overall-progress-bar').style.width = `${overallPercentage}%`;
             document.querySelector('.percentage').textContent = `${Math.round(overallPercentage)}%`;
