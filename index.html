@@ -552,235 +552,236 @@
         };
 
         // Define all challenges
-        const challenges = [
-            'sugar', 
-            'gym', 
-            'development', 
-            'dsa', 
-            'english', 
-            'psychology', 
-            'selfcare',
-            'powerup'
-        ];
+    // Define all challenges
+const challenges = [
+    'sugar',
+    'gym',
+    'development',
+    'dsa',
+    'english',
+    'psychology',
+    'selfcare',
+    'powerup'
+];
 
-        // Total days for challenges
-        const totalDays = 21;
+// Total days for challenges
+const totalDays = 21;
 
-        // Current challenge and day for modal
-        let currentChallenge = '';
-        let currentDay = 0;
+// Current challenge and day for modal
+let currentChallenge = '';
+let currentDay = 0;
 
-        // Initialize the app
-        function initApp() {
-            // Create calendars for each challenge
-            challenges.forEach(challenge => {
-                createCalendar(challenge);
-                updateProgress(challenge);
-            });
+// Initialize the app
+function initApp() {
+    // Create calendars for each challenge
+    challenges.forEach(challenge => {
+        createCalendar(challenge);
+        updateProgress(challenge);
+    });
 
-            // Create summary cards for the home page
-            updateSummaryGrid();
-            updateOverallProgress();
+    // Create summary cards for the home page
+    updateSummaryGrid();
+    updateOverallProgress();
 
-            // Set up tab navigation
-            setupTabs();
+    // Set up tab navigation
+    setupTabs();
 
-            // Add event listeners to reset buttons
-            document.querySelectorAll('.reset-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const challenge = this.dataset.challenge;
-                    resetProgress(challenge);
-                });
-            });
+    // Add event listeners to reset buttons
+    document.querySelectorAll('.reset-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const challenge = this.dataset.challenge;
+            resetProgress(challenge);
+        });
+    });
 
-            // Set up modal event listeners
-            setupModal();
+    // Set up modal event listeners
+    setupModal();
+}
+
+// Create calendar for a challenge
+function createCalendar(challenge) {
+    const calendar = document.getElementById(`${challenge}-calendar`);
+    calendar.innerHTML = '';
+
+    // Get saved progress for this challenge
+    const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`) || '{}');
+
+    // Create 21 days
+    for (let i = 1; i <= totalDays; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+        dayElement.dataset.day = i;
+        dayElement.dataset.challenge = challenge;
+
+        if (savedProgress[i] === 'done') {
+            dayElement.classList.add('completed');
+        } else if (savedProgress[i] === 'not-done') {
+            dayElement.classList.add('not-completed');
         }
 
-        // Create calendar for a challenge
-        function createCalendar(challenge) {
-            const calendar = document.getElementById(`${challenge}-calendar`);
-            calendar.innerHTML = '';
-            
-            // Get saved progress for this challenge
-            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
-            
-            // Create 21 days
-            for (let i = 1; i <= totalDays; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.classList.add('day');
-                dayElement.dataset.day = i;
-                dayElement.dataset.challenge = challenge;
-                
-                if (savedProgress[i] === 'done') {
-                    dayElement.classList.add('completed');
-                } else if (savedProgress[i] === 'not-done') {
-                    dayElement.classList.add('not-completed');
-                }
-                
-                const statusText = savedProgress[i] === 'done' ? 'Done' : 
-                                  (savedProgress[i] === 'not-done' ? 'Not Done' : 'Pending');
-                
-                dayElement.innerHTML = `
-                    <span class="day-number">${i}</span>
-                    <span class="day-status">${statusText}</span>
-                `;
-                
-                dayElement.addEventListener('click', () => openStatusModal(challenge, i));
-                
-                calendar.appendChild(dayElement);
-            }
-        }
+        const statusText = savedProgress[i] === 'done' ? 'Done' :
+                          (savedProgress[i] === 'not-done' ? 'Not Done' : 'Pending');
 
-        // Setup the modal and its buttons
-        function setupModal() {
-            const modal = document.getElementById('status-modal');
-            const markDoneBtn = document.getElementById('mark-done');
-            const markNotDoneBtn = document.getElementById('mark-not-done');
-            const cancelBtn = document.getElementById('cancel-mark');
-            
-            markDoneBtn.addEventListener('click', () => {
-                setDayStatus(currentChallenge, currentDay, 'done');
-                closeModal();
-            });
-            
-            markNotDoneBtn.addEventListener('click', () => {
-                setDayStatus(currentChallenge, currentDay, 'not-done');
-                closeModal();
-            });
-            
-            cancelBtn.addEventListener('click', closeModal);
-            
-            // Close modal if clicked outside content
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal();
-                }
-            });
-        }
+        dayElement.innerHTML = `
+            <span class="day-number">${i}</span>
+            <span class="day-status">${statusText}</span>
+        `;
 
-        // Open the status modal
-        function openStatusModal(challenge, day) {
-            currentChallenge = challenge;
-            currentDay = day;
-            
-            document.getElementById('selected-day').textContent = day;
-            document.getElementById('status-modal').classList.add('active');
-        }
+        dayElement.addEventListener('click', () => openStatusModal(challenge, i));
 
-        // Close the status modal
-        function closeModal() {
-            document.getElementById('status-modal').classList.remove('active');
-        }
+        calendar.appendChild(dayElement);
+    }
+}
 
-        // Set the status of a day
-        function setDayStatus(challenge, day, status) {
-            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
-            
-            // Toggle status if already set to this status
-            if (savedProgress[day] === status) {
-                delete savedProgress[day];
-            } else {
-                savedProgress[day] = status;
-            }
-            
-            appStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
-            
-            createCalendar(challenge);
-            updateProgress(challenge);
-            updateSummaryGrid();
-            updateOverallProgress();
-        }
+// Setup the modal and its buttons
+function setupModal() {
+    const modal = document.getElementById('status-modal');
+    const markDoneBtn = document.getElementById('mark-done');
+    const markNotDoneBtn = document.getElementById('mark-not-done');
+    const cancelBtn = document.getElementById('cancel-mark');
 
-        // Update progress for a challenge
-        function updateProgress(challenge) {
-            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
-            const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
-            const progressPercentage = (completedDays / totalDays) * 100;
-            
-            document.getElementById(`${challenge}-progress`).style.width = `${progressPercentage}%`;
-            document.getElementById(`${challenge}-days-completed`).textContent = `${completedDays}/${totalDays} days completed`;
-        }
+    markDoneBtn.addEventListener('click', () => {
+        setDayStatus(currentChallenge, currentDay, 'done');
+        closeModal();
+    });
 
-        // Reset progress for a challenge
-        function resetProgress(challenge) {
-            if (confirm(`Are you sure you want to reset your progress for the ${challenge.charAt(0).toUpperCase() + challenge.slice(1)} Challenge?`)) {
-                appStorage.removeItem(`${challenge}-progress`);
-                createCalendar(challenge);
-                updateProgress(challenge);
-                updateSummaryGrid();
-                updateOverallProgress();
-            }
-        }
+    markNotDoneBtn.addEventListener('click', () => {
+        setDayStatus(currentChallenge, currentDay, 'not-done');
+        closeModal();
+    });
 
-        // Update the summary grid on the home page
-        function updateSummaryGrid() {
-            const summaryGrid = document.getElementById('summary-grid');
-            summaryGrid.innerHTML = '';
-            
-            challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
-                const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
-                const progressPercentage = (completedDays / totalDays) * 100;
-                
-                const summaryCard = document.createElement('div');
-                summaryCard.classList.add('summary-card');
-                
-                // Capitalize challenge name
-                const challengeName = challenge.charAt(0).toUpperCase() + challenge.slice(1);
-                
-                summaryCard.innerHTML = `
-                    <h3>${challengeName} Challenge</h3>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: ${progressPercentage}%"></div>
-                    </div>
-                    <p>${completedDays}/${totalDays} days completed (${Math.round(progressPercentage)}%)</p>
-                `;
-                
-                summaryGrid.appendChild(summaryCard);
-            });
-        }
+    cancelBtn.addEventListener('click', closeModal);
 
-        // Update overall progress on the home page
-        function updateOverallProgress() {
-            let totalDaysAll = challenges.length * totalDays;
-            let totalCompletedDays = 0;
-            
-            challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
-                const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
-                totalCompletedDays += completedDays;
-            });
-            
-            const overallPercentage = (totalCompletedDays / totalDaysAll) * 100;
-            
-            document.getElementById('overall-progress-bar').style.width = `${overallPercentage}%`;
-            document.querySelector('.percentage').textContent = `${Math.round(overallPercentage)}%`;
-            document.querySelector('.circle-progress').style.background = 
-                `conic-gradient(var(--primary-color) ${overallPercentage}%, var(--grey-color) 0)`;
+    // Close modal if clicked outside content
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
         }
+    });
+}
 
-        // Set up tab navigation
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs and tab contents
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    
-                    // Add active class to the clicked tab and corresponding content
-                    tab.classList.add('active');
-                    const tabId = tab.dataset.tab;
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-        }
+// Open the status modal
+function openStatusModal(challenge, day) {
+    currentChallenge = challenge;
+    currentDay = day;
 
-        // Initialize the app when the page loads
-        document.addEventListener('DOMContentLoaded', initApp);
+    document.getElementById('selected-day').textContent = day;
+    document.getElementById('status-modal').classList.add('active');
+}
+
+// Close the status modal
+function closeModal() {
+    document.getElementById('status-modal').classList.remove('active');
+}
+
+// Set the status of a day
+function setDayStatus(challenge, day, status) {
+    const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`) || '{}');
+
+    // Toggle status if already set to this status
+    if (savedProgress[day] === status) {
+        delete savedProgress[day];
+    } else {
+        savedProgress[day] = status;
+    }
+
+    localStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
+
+    createCalendar(challenge);
+    updateProgress(challenge);
+    updateSummaryGrid();
+    updateOverallProgress();
+}
+
+// Update progress for a challenge
+function updateProgress(challenge) {
+    const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`) || '{}');
+    const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
+    const progressPercentage = (completedDays / totalDays) * 100;
+
+    document.getElementById(`${challenge}-progress`).style.width = `${progressPercentage}%`;
+    document.getElementById(`${challenge}-days-completed`).textContent = `${completedDays}/${totalDays} days completed`;
+}
+
+// Reset progress for a challenge
+function resetProgress(challenge) {
+    if (confirm(`Are you sure you want to reset your progress for the ${challenge.charAt(0).toUpperCase() + challenge.slice(1)} Challenge?`)) {
+        localStorage.removeItem(`${challenge}-progress`);
+        createCalendar(challenge);
+        updateProgress(challenge);
+        updateSummaryGrid();
+        updateOverallProgress();
+    }
+}
+
+// Update the summary grid on the home page
+function updateSummaryGrid() {
+    const summaryGrid = document.getElementById('summary-grid');
+    summaryGrid.innerHTML = '';
+
+    challenges.forEach(challenge => {
+        const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`) || '{}');
+        const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
+        const progressPercentage = (completedDays / totalDays) * 100;
+
+        const summaryCard = document.createElement('div');
+        summaryCard.classList.add('summary-card');
+
+        // Capitalize challenge name
+        const challengeName = challenge.charAt(0).toUpperCase() + challenge.slice(1);
+
+        summaryCard.innerHTML = `
+            <h3>${challengeName} Challenge</h3>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${progressPercentage}%"></div>
+            </div>
+            <p>${completedDays}/${totalDays} days completed (${Math.round(progressPercentage)}%)</p>
+        `;
+
+        summaryGrid.appendChild(summaryCard);
+    });
+}
+
+// Update overall progress on the home page
+function updateOverallProgress() {
+    let totalDaysAll = challenges.length * totalDays;
+    let totalCompletedDays = 0;
+
+    challenges.forEach(challenge => {
+        const savedProgress = JSON.parse(localStorage.getItem(`${challenge}-progress`) || '{}');
+        const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
+        totalCompletedDays += completedDays;
+    });
+
+    const overallPercentage = (totalCompletedDays / totalDaysAll) * 100;
+
+    document.getElementById('overall-progress-bar').style.width = `${overallPercentage}%`;
+    document.querySelector('.percentage').textContent = `${Math.round(overallPercentage)}%`;
+    document.querySelector('.circle-progress').style.background =
+        `conic-gradient(var(--primary-color) ${overallPercentage}%, var(--grey-color) 0)`;
+}
+
+// Set up tab navigation
+function setupTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and tab contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to the clicked tab and corresponding content
+            tab.classList.add('active');
+            const tabId = tab.dataset.tab;
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+}
+
+// Initialize the app when the page loads
+document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
