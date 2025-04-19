@@ -134,7 +134,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
 
         .day:hover {
@@ -152,37 +151,6 @@
             font-size: 0.8rem;
             color: var(--dark-color);
             opacity: 0.7;
-        }
-
-        .day-actions {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            overflow: hidden;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        .day-action {
-            flex: 1;
-            padding: 5px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .day-action.done {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .day-action.not-done {
-            background-color: var(--danger-color);
-            color: white;
         }
 
         .day.completed {
@@ -292,6 +260,98 @@
             font-size: 2rem;
             font-weight: bold;
             color: var(--primary-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .done-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .done-btn:hover {
+            background-color: #3d8b40;
+        }
+
+        .not-done-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .not-done-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .cancel-btn {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .cancel-btn:hover {
+            background-color: var(--grey-color);
         }
 
         @media (max-width: 768px) {
@@ -461,7 +521,36 @@
         </div>
     </div>
 
+    <!-- Status Selection Modal -->
+    <div class="modal" id="status-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Day <span id="selected-day">0</span></h3>
+                <p>Mark your progress for this day</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn done-btn" id="mark-done">Done</button>
+                <button class="modal-btn not-done-btn" id="mark-not-done">Not Done</button>
+                <button class="modal-btn cancel-btn" id="cancel-mark">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // In-memory storage to replace localStorage 
+        const appStorage = {
+            data: {},
+            getItem: function(key) {
+                return this.data[key] || null;
+            },
+            setItem: function(key, value) {
+                this.data[key] = value;
+            },
+            removeItem: function(key) {
+                delete this.data[key];
+            }
+        };
+
         // Define all challenges
         const challenges = [
             'sugar', 
@@ -477,19 +566,9 @@
         // Total days for challenges
         const totalDays = 21;
 
-        // In-memory storage to replace localStorage
-        const memoryStorage = {
-            data: {},
-            getItem: function(key) {
-                return this.data[key] ? this.data[key] : null;
-            },
-            setItem: function(key, value) {
-                this.data[key] = value;
-            },
-            removeItem: function(key) {
-                delete this.data[key];
-            }
-        };
+        // Current challenge and day for modal
+        let currentChallenge = '';
+        let currentDay = 0;
 
         // Initialize the app
         function initApp() {
@@ -513,6 +592,9 @@
                     resetProgress(challenge);
                 });
             });
+
+            // Set up modal event listeners
+            setupModal();
         }
 
         // Create calendar for a challenge
@@ -521,12 +603,14 @@
             calendar.innerHTML = '';
             
             // Get saved progress for this challenge
-            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
             
             // Create 21 days
             for (let i = 1; i <= totalDays; i++) {
                 const dayElement = document.createElement('div');
                 dayElement.classList.add('day');
+                dayElement.dataset.day = i;
+                dayElement.dataset.challenge = challenge;
                 
                 if (savedProgress[i] === 'done') {
                     dayElement.classList.add('completed');
@@ -535,33 +619,63 @@
                 }
                 
                 const statusText = savedProgress[i] === 'done' ? 'Done' : 
-                                  (savedProgress[i] === 'not-done' ? 'Not Done' : 'Choose Status');
+                                  (savedProgress[i] === 'not-done' ? 'Not Done' : 'Pending');
                 
                 dayElement.innerHTML = `
                     <span class="day-number">${i}</span>
                     <span class="day-status">${statusText}</span>
-                    <div class="day-actions">
-                        <div class="day-action done" data-status="done">Done</div>
-                        <div class="day-action not-done" data-status="not-done">Not Done</div>
-                    </div>
                 `;
                 
-                const actionButtons = dayElement.querySelectorAll('.day-action');
-                actionButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const status = btn.dataset.status;
-                        setDayStatus(challenge, i, status);
-                    });
-                });
+                dayElement.addEventListener('click', () => openStatusModal(challenge, i));
                 
                 calendar.appendChild(dayElement);
             }
         }
 
+        // Setup the modal and its buttons
+        function setupModal() {
+            const modal = document.getElementById('status-modal');
+            const markDoneBtn = document.getElementById('mark-done');
+            const markNotDoneBtn = document.getElementById('mark-not-done');
+            const cancelBtn = document.getElementById('cancel-mark');
+            
+            markDoneBtn.addEventListener('click', () => {
+                setDayStatus(currentChallenge, currentDay, 'done');
+                closeModal();
+            });
+            
+            markNotDoneBtn.addEventListener('click', () => {
+                setDayStatus(currentChallenge, currentDay, 'not-done');
+                closeModal();
+            });
+            
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Close modal if clicked outside content
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Open the status modal
+        function openStatusModal(challenge, day) {
+            currentChallenge = challenge;
+            currentDay = day;
+            
+            document.getElementById('selected-day').textContent = day;
+            document.getElementById('status-modal').classList.add('active');
+        }
+
+        // Close the status modal
+        function closeModal() {
+            document.getElementById('status-modal').classList.remove('active');
+        }
+
         // Set the status of a day
         function setDayStatus(challenge, day, status) {
-            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
             
             // Toggle status if already set to this status
             if (savedProgress[day] === status) {
@@ -570,7 +684,7 @@
                 savedProgress[day] = status;
             }
             
-            memoryStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
+            appStorage.setItem(`${challenge}-progress`, JSON.stringify(savedProgress));
             
             createCalendar(challenge);
             updateProgress(challenge);
@@ -580,7 +694,7 @@
 
         // Update progress for a challenge
         function updateProgress(challenge) {
-            const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+            const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
             const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
             const progressPercentage = (completedDays / totalDays) * 100;
             
@@ -591,7 +705,7 @@
         // Reset progress for a challenge
         function resetProgress(challenge) {
             if (confirm(`Are you sure you want to reset your progress for the ${challenge.charAt(0).toUpperCase() + challenge.slice(1)} Challenge?`)) {
-                memoryStorage.removeItem(`${challenge}-progress`);
+                appStorage.removeItem(`${challenge}-progress`);
                 createCalendar(challenge);
                 updateProgress(challenge);
                 updateSummaryGrid();
@@ -605,7 +719,7 @@
             summaryGrid.innerHTML = '';
             
             challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+                const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
                 const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
                 const progressPercentage = (completedDays / totalDays) * 100;
                 
@@ -633,7 +747,7 @@
             let totalCompletedDays = 0;
             
             challenges.forEach(challenge => {
-                const savedProgress = JSON.parse(memoryStorage.getItem(`${challenge}-progress`) || '{}');
+                const savedProgress = JSON.parse(appStorage.getItem(`${challenge}-progress`)) || {};
                 const completedDays = Object.values(savedProgress).filter(value => value === 'done').length;
                 totalCompletedDays += completedDays;
             });
